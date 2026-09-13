@@ -105,6 +105,16 @@ function buildRecipes(rows) {
   });
 }
 
+function sortRecipesForDisplay(recipes) {
+  return [...recipes].sort((first, second) => {
+    if (Boolean(first.recipeText) === Boolean(second.recipeText)) {
+      return first.id - second.id;
+    }
+
+    return first.recipeText ? -1 : 1;
+  });
+}
+
 async function loadRecipes() {
   const response = await fetch(CSV_PATH);
   if (!response.ok) {
@@ -122,13 +132,14 @@ function truncate(text, maxLength) {
 function renderIndex(recipes) {
   const grid = document.querySelector("#recipe-grid");
   const count = document.querySelector("#recipe-count");
+  const sortedRecipes = sortRecipesForDisplay(recipes);
   if (!grid) return;
 
   if (count) {
-    count.textContent = recipes.length;
+    count.textContent = sortedRecipes.length;
   }
 
-  grid.innerHTML = recipes
+  grid.innerHTML = sortedRecipes
     .map((recipe) => `
       <a class="recipe-card" href="recipe.html?id=${recipe.id}">
         <div class="recipe-art" aria-hidden="true">${recipe.icon}</div>
